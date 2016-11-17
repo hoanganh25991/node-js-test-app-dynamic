@@ -1,32 +1,27 @@
-require("appdynamics").profile({
-	controllerHostName: 'originallyussg.saas.appdynamics.com',
-	controllerPort: 443, 
+// require("appdynamics").profile({
+// 	controllerHostName: 'originallyussg.saas.appdynamics.com',
+// 	controllerPort: 443, 
 
-	// If SSL, be sure to enable the next line
-	controllerSslEnabled: true,
-	accountName: 'originallyussg',
-	accountAccessKey: 'j3i8ckm981gf',
-	applicationName: 'test-app-dynamic',
-	tierName: 'tier2',
-	nodeName: 'process' // The controller will automatically append the node name with a unique number
-});
+// 	// If SSL, be sure to enable the next line
+// 	// controllerSslEnabled: true,
+// 	accountName: 'originallyussg',
+// 	accountAccessKey: 'j3i8ckm981gf',
+// 	applicationName: 'test-app-dynamic',
+// 	tierName: 'tier2',
+// 	nodeName: 'process' // The controller will automatically append the node name with a unique number
+// });
 //Lets require/import the HTTP module
-var http = require('http');
+let fs = require('fs');
+let privateKey = fs.readFileSync('/etc/letsencrypt/live/tinker.press/privkey.pem');
+let certificate = fs.readFileSync('/etc/letsencrypt/live/tinker.press/cert.pem');
 
-//Lets define a port we want to listen to
-const PORT=3000; 
+let https = require('https');
 
-//We need a function which handles requests and send response
-function handleRequest(request, response){
-	console.log('A req come');
-	response.end('It Works!! Path Hit: ' + request.url);
-}
+let credentials = {key: privateKey, cert: certificate};
 
-//Create a server
-var server = http.createServer(handleRequest);
-
-//Lets start our server
-server.listen(PORT, function(){
-	//Callback triggered when server is successfully listening. Hurray!
-	console.log("Server listening on: http://localhost:%s", PORT);
-});
+https.createServer(credentials, (req, res) => {
+	console.log('a req come');
+	res.writeHead(200);
+	res.end('hello world\n');
+	// res.write('hello world\n');
+}).listen(3001, ()=>{console.log('server running')});
